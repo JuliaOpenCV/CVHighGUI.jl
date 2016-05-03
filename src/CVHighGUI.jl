@@ -27,7 +27,7 @@ for name in [
     :WINDOW_FREERATIO,
     :WINDOW_KEEPRATIO,
     ]
-    ex = Expr(:macrocall, symbol("@icxx_str"), string("cv::", name, ";"))
+    ex = Expr(:macrocall, Symbol("@icxx_str"), string("cv::", name, ";"))
     @eval global const $name = $ex
 end
 
