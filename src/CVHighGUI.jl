@@ -1,6 +1,7 @@
 module CVHighGUI
 
-export imshow, waitKey, destroyWIndow, destroyAllWindows
+export imshow, waitKey, destroyWIndow, destroyAllWindows, namedWindow,
+    createTrackbar, getTrackbarPos
 
 using LibOpenCV
 using CVCore
@@ -42,5 +43,35 @@ destroyAllWindows() = icxx"cv::destroyAllWindows();"
 
 waitKey(delay) = icxx"cv::waitKey($delay);"
 waitKey(;delay::Int=0) = waitKey(delay)
+
+function createTrackbar(trackbarname::String, winname::String,
+    value::Ptr{Cint}, count, onChange::Ptr{Void}=C_NULL,
+    userdata::Ptr{Void}=C_NULL)
+    icxx"""
+    cv::createTrackbar($(pointer(trackbarname)), $(pointer(winname)),
+        $value, $count, (void(*)(int,void*))$onChange, $userdata);
+    """
+end
+function createTrackbar(trackbarname::String, winname::String,
+    value::Vector{Cint}, count;
+    onChange::Ptr{Void}=C_NULL, userdata::Ptr{Void}=C_NULL)
+    createTrackbar(trackbarname, winname, pointer(value), count,
+        onChange, userdata)
+end
+function createTrackbar(trackbarname::String, winname::String,
+    value::Number, count;
+    onChange::Ptr{Void}=C_NULL, userdata::Ptr{Void}=C_NULL)
+    v = Cint[value]
+    createTrackbar(trackbarname, winname, pointer(v), count,
+        onChange, userdata)
+end
+
+function getTrackbarPos(trackbarname::String, winname::String)
+    icxx"cv::getTrackbarPos($(pointer(trackbarname)), $(pointer(winname)));"
+end
+
+function namedWindow(winname::String, flags=WINDOW_AUTOSIZE)
+    icxx"cv::namedWindow($(pointer(winname)), $flags);"
+end
 
 end # module
